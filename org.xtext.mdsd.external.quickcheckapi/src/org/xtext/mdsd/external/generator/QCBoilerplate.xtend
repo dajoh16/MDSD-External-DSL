@@ -13,7 +13,7 @@ class QCBoilerplate {
 		for (test : builder.tests) {
 			val filename = test.name + "externals.ml";
 			if (!fsa.isFile(filename)) {
-				fsa.generateFile(QCUtils.firstCharLowerCase(filename), InitExternalsImplementation);
+				fsa.generateFile(QCUtils.firstCharLowerCase(filename), InitExternalsImplementation());
 			}
 		}
 		

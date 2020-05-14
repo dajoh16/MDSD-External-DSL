@@ -24,23 +24,23 @@ class QCNextState {
 	}
 	
 	def CharSequence compile(Action action){
-		var actionOp = action.actionOp
-		if (actionOp instanceof CreateAction) {
-			''' -> state@["«QCUtils.compileJson(action.value)»"]'''	
-		} else if (actionOp instanceof DeleteAction){
+		
+		if (action instanceof CreateAction) {
+			''' -> state@["«QCUtils.compileJsonUse(action.value)»"]'''	
+		} else if (action instanceof DeleteAction){
 			'''
 			ix -> let pos = getPos ix state in
 			      (* Returns a list of all items except that which is 'item' found above *)
 			      let l = remove_item pos state in
 			      l
 	        '''
-		} else if (actionOp instanceof UpdateAction){
+		} else if (action instanceof UpdateAction){
 			'''
-			ix -> let newelem = "«QCUtils.compileJson(action.value)»" in
+			ix -> let newelem = "«QCUtils.compileJsonUse(action.value)»" in
 			      let pos = getPos ix state in
 			      replaceElem pos state newelem
 			'''	
-		} else if (actionOp instanceof NoAction){
+		} else if (action instanceof NoAction){
 			''' ix -> state'''
 		} else {
 			''''''

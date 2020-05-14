@@ -14,11 +14,12 @@ import org.xtext.mdsd.external.quickCheckApi.IntValue
 import org.xtext.mdsd.external.quickCheckApi.StringValue
 import org.xtext.mdsd.external.quickCheckApi.NestedJsonValue
 import org.xtext.mdsd.external.quickCheckApi.ListJsonValue
+import org.xtext.mdsd.external.quickCheckApi.VariableUse
+import org.xtext.mdsd.external.quickCheckApi.Json
+import org.xtext.mdsd.external.quickCheckApi.IdValue
 
 class QCUtils {
-	
-
-	
+		
 	def static List<Request> filterbyMethod(EList<Request> requests, Class<? extends Method> method){
 		val filtered = new ArrayList
 		for (request : requests) {
@@ -37,11 +38,13 @@ class QCUtils {
 		 s.substring(0,1).toLowerCase + s.substring(1)
 	}
 	
+	
+	
 	def static boolean requireIndex(Request request){
 		// If anything else than a CreateAction then True
 		if(request.url.domain.requestID === null)
 			false
-		else if (CreateAction.isAssignableFrom(request.action.actionOp.class))
+		else if (CreateAction.isAssignableFrom(request.action.class))
 			false
 		else
 			true
@@ -72,7 +75,11 @@ class QCUtils {
 		'''[«FOR value : json.jsonValues SEPARATOR ","»«value.compileJson»«ENDFOR»]'''
 	}
 	def static dispatch CharSequence compileJson(JsonPair json){
-		'''\"«json.key»\":«json.value.compileJson»'''
+		if(QCJsonUtils.isIdInJson(json)){
+			''''''
+		} else {
+			'''\"«json.key»\":«json.value.compileJson»'''
+		}
 	}
 	def static dispatch CharSequence compileJson(IntValue json){
 		'''«json.value»'''
@@ -86,7 +93,17 @@ class QCUtils {
 	def static dispatch CharSequence compileJson(ListJsonValue json){
 		'''«json.value.compileJson»'''
 	}
+	def static dispatch CharSequence compileJson(IdValue json){
+		''''''
+	}
 	
+	def static dispatch CharSequence compileJsonUse(VariableUse json){
+		QCJsonUtils.trimJson(QCUtils.compileJson(json.variable.variableValue))
+		
+	}
+	def static dispatch CharSequence compileJsonUse(Json json){
+		QCJsonUtils.trimJson(QCUtils.compileJson(json))
+	}	
 	
 	
 	

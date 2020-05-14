@@ -3,23 +3,23 @@ grammar org.xtext.mdsd.external.QuickCheckApi with org.eclipse.xtext.common.Term
 generate quickCheckApi "http://www.xtext.org/mdsd/external/QuickCheckApi"
 
 Builder: 
-	"TestBuilder" tests+=Test+;
+	tests+=Test+;
 
 Test:
-	"Test" name=ID requests+=(Request)+
+	"Test" name=ID variableDefs+=(VariableDef)* requests+=(Request)+
+;
+VariableDef:
+	"var" name=ID "=" variableValue=Json
 ;
 
 Request:
-    "request" name=ID method=Method url=URL ("Precondition:" preconditions=PreLogicExp)? 
-    (params=Param)? body=Body? ("STATE:" action=Action) ("Postcondition:"postconditions=PostLogicExp)?
+    "request" name=ID method=Method url=URL ("Precond:" preconditions=PreLogicExp)? 
+    (params=Param)? body=Body? ("STATE:" action=Action) ("Postcond:"postconditions=PostLogicExp)?
 ;
+
 
 Action:
-	actionOp=ActionOperator value=Json | actionOp=ActionOperator
-;
-
-ActionOperator:
-	{CreateAction} "create" | {DeleteAction} "delete" | {UpdateAction} "update" | {NoAction} "none"
+	{CreateAction} "create" value=JsonUse | {DeleteAction} "delete" value=JsonUse | {UpdateAction} "update" value=JsonUse | {NoAction} "none"
 ;
 
 
@@ -77,7 +77,15 @@ Key:
 ;
 
 Body:
-	"body" value=Json
+	"body" value=JsonUse
+;
+
+JsonUse:
+	VariableUse | Json
+;
+
+VariableUse:
+	variable=[VariableDef]
 ;
 
 Json:
@@ -93,15 +101,23 @@ JsonObject returns Json:
 	{JsonObject} "{" jsonPairs+=JsonPair ("," jsonPairs+=JsonPair)* "}"
 ;
 
-JsonPair  returns Json:
-	{JsonPair} key=STRING ":" value=JsonValue
+JsonPair returns Json:
+	{JsonPair} key=ID ":" value=JsonValue
 ;
 
 JsonValue returns Json:
-	{StringValue} value=STRING | {IntValue} value=INT | {NestedJsonValue} value=JsonObject | {ListJsonValue} value=JsonList
+	{StringValue} value=STRING | {IntValue} value=INT |
+	{NestedJsonValue} value=JsonObject | {ListJsonValue} value=JsonList |
+	{IdValue} value=IdJson
 ;
 
+IdJson:
+	"@Id" idType=IdType
+;
 
+IdType:
+	{IntType} "int" | {StrType} "str"
+;
 
 PreLogicExp returns Preproposition:
 	PreConjunction("OR" {PreDisjunction.left=current} right=PreConjunction)*
@@ -112,7 +128,7 @@ PreConjunction returns Preproposition:
 ;
 
 Precondition returns Preproposition:
-	{ContainsCondition} notOp=NotOp? "contains" value=Json | {EmptyCondition} notOp=NotOp? "empty"
+	{ContainsCondition} notOp=NotOp? "contains" value=JsonUse | {EmptyCondition} notOp=NotOp? "empty"
 ;
 
 PostLogicExp returns Postproposition:
@@ -133,7 +149,7 @@ StatusCode:
 ;
 
 ResponseBody:
-	{ResponseBody} "body" body=Json?
+	{ResponseBody} "body" body=JsonUse?
 ;
 
 RequestOp:

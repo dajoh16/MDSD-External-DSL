@@ -18,20 +18,21 @@ import org.xtext.mdsd.external.quickCheckApi.CreateAction
 import org.xtext.mdsd.external.quickCheckApi.BodyCondition
 import org.xtext.mdsd.external.quickCheckApi.CodeCondition
 import org.xtext.mdsd.external.quickCheckApi.RequestOp
+import org.xtext.mdsd.external.quickCheckApi.VariableUse
+import org.xtext.mdsd.external.quickCheckApi.Json
 
 class QCRunCmd {
 	def initRun_cmd(Test test ) {
 		'''
 		let run_cmd cmd state sut = match cmd with
 			«FOR request : test.requests»
-			| «QCUtils.toUpperCaseFunction(request.name)» «request.action.determineIndex» if (checkInvariant state sut) then «request.compileRunCmd» else false
+			| «QCUtils.toUpperCaseFunction(request.name)» «request.action.determineIndex» «request.compileRunCmd»
 			«ENDFOR»
 		'''
 	}
 	
 	def CharSequence determineIndex(Action action){
-		var actionOp = action.actionOp
-		if (actionOp instanceof DeleteAction || actionOp instanceof UpdateAction || actionOp instanceof NoAction){
+		if (action instanceof DeleteAction || action instanceof UpdateAction || action instanceof NoAction){
 			'''ix ->'''
 		} else {
 			''' ->'''
@@ -53,8 +54,10 @@ class QCRunCmd {
 	}
 	
 	def CharSequence compileBody(Body body) {
-		QCUtils.compileJson(body.value)
-	}	
+		QCUtils.compileJsonUse(body.value)
+	}
+	
+	
 	
 	def dispatch CharSequence compileMethod(GET get) {
 		'''get'''
@@ -75,9 +78,8 @@ class QCRunCmd {
 	
 	def CharSequence compileRunCmd(Request request){
 		'''
-		
 		«request.createHttpCall»
-		«request.action.actionOp.compileAction»
+		«request.action.compileAction()»
 		«request.postconditions.compilePostCondition»
 		'''
 	}
@@ -98,7 +100,7 @@ class QCRunCmd {
 	
 	def dispatch CharSequence compilePostCondition(BodyCondition condition) {
 		if(condition.requestValue.body !== null){
-			'''«condition.requestOp.compileRequestOp» (String.compare (Yojson.Basic.to_string «QCUtils.compileJson(condition.requestValue.body)») (Yojson.Basic.to_string content) == 0)'''
+			'''«condition.requestOp.compileRequestOp» (String.compare (Yojson.Basic.to_string «QCUtils.compileJsonUse(condition.requestValue.body)») (Yojson.Basic.to_string content) == 0)'''
 		} else if (condition.requestValue.body === null){
 		'''
 		let extractedState = lookupItem ix state in
@@ -119,11 +121,16 @@ class QCRunCmd {
 	}
 	
 	
+	
 	def dispatch CharSequence compileAction(CreateAction action) {
+		if(QCJsonUtils.isIdInJsonUse(action.value)){
 		'''
-		let id = extractIdFromContent content in
+		let id = content «QCJsonUtils.extractId(action.value)» in
 			sut := !sut@[id];
 		'''
+		} else {
+		''''''
+		}
 	}
 	def dispatch CharSequence compileAction(DeleteAction action) {
 		'''
