@@ -109,4 +109,40 @@ class QCJsonUtils {
 		'''|> to_string'''
 	}
 	
+	def static dispatch CharSequence extractIdJsonFromJsonUse(Json json){
+		extractIdJsonFromJson(json)
+	}
+	def static dispatch CharSequence extractIdJsonFromJsonUse(VariableUse json){
+		extractIdJsonFromJson(json.variable.variableValue)
+	}
+	
+	def static dispatch CharSequence extractIdJsonFromJson(JsonObject json){
+		for(Json jsonPair : json.jsonPairs) {
+			if(isIdInJson(jsonPair)){
+				return extractIdJsonFromJson(jsonPair)
+			}
+		}
+	}
+	def static dispatch CharSequence extractIdJsonFromJson(JsonList json){
+		''''''
+	}
+	def static dispatch CharSequence extractIdJsonFromJson(JsonPair json){
+		'''"{\"«json.key»\": «extractIdJsonFromJson(json.value)» }"'''
+	}
+	def static dispatch CharSequence extractIdJsonFromJson(IntValue json){
+		''''''
+	}
+	def static dispatch CharSequence extractIdJsonFromJson(StringValue json){
+		''''''
+	}
+	def static dispatch CharSequence extractIdJsonFromJson(IdValue json){
+		'''" ^ id ^ "'''
+	}
+	def static dispatch CharSequence extractIdJsonFromJson(NestedJsonValue json){
+		''''''
+	}
+	def static dispatch CharSequence extractIdJsonFromJson(ListJsonValue json){
+		''''''
+	}
+	
 }

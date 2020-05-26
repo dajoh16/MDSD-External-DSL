@@ -99,16 +99,18 @@ class QCRunCmd {
 	}
 	
 	def dispatch CharSequence compilePostCondition(BodyCondition condition) {
-		if(condition.requestValue.body !== null){
+		if(QCJsonUtils.isIdInJsonUse(condition.requestValue.body)){
+			'''
+			let extractedState = lookupItem ix state in
+				let id = lookupSutItem ix !sut in
+					let stateJson = Yojson.Basic.from_string extractedState in
+						let sutJson = Yojson.Basic.from_string («QCJsonUtils.extractIdJsonFromJsonUse(condition.requestValue.body)») in
+							let combined = Yojson.Basic.Util.combine stateJson sutJson
+							«condition.requestOp.compileRequestOp» (String.compare (Yojson.Basic.to_string combined) (Yojson.Basic.to_string content) == 0)
+			'''
+			
+		} else {
 			'''«condition.requestOp.compileRequestOp» (String.compare (Yojson.Basic.to_string «QCUtils.compileJsonUse(condition.requestValue.body)») (Yojson.Basic.to_string content) == 0)'''
-		} else if (condition.requestValue.body === null){
-		'''
-		let extractedState = lookupItem ix state in
-			let id = lookupSutItem ix !sut in
-				let stateJson = Yojson.Basic.from_string extractedState in
-					let combined = combine_state_id stateJson id in
-						«condition.requestOp.compileRequestOp» (String.compare (Yojson.Basic.to_string combined) (Yojson.Basic.to_string content) == 0)
-		'''
 		}
 	}
 	

@@ -35,12 +35,7 @@ class QCCmd {
 	}
 	
 	 private def CharSequence compile(URI uri) {
-		'''
-		«IF uri !== null»
-		«uri.name»/«FOR part : uri.path SEPARATOR "/"»«part.part»«ENDFOR»
-		«ELSE»
-		«ENDIF»
-		'''
+		'''«IF uri !== null»«uri.name»/«FOR part : uri.path SEPARATOR "/"»«part.part»«ENDFOR»«ENDIF»'''
 	}
 	
 	

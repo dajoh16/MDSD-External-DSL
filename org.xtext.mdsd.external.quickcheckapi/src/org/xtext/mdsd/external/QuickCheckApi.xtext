@@ -149,7 +149,7 @@ StatusCode:
 ;
 
 ResponseBody:
-	{ResponseBody} "body" body=JsonUse?
+	{ResponseBody} "body" body=JsonUse
 ;
 
 RequestOp:
