@@ -17,8 +17,12 @@ import org.xtext.mdsd.external.quickCheckApi.ListJsonValue
 import org.xtext.mdsd.external.quickCheckApi.VariableUse
 import org.xtext.mdsd.external.quickCheckApi.Json
 import org.xtext.mdsd.external.quickCheckApi.IdValue
+import org.xtext.mdsd.external.quickCheckApi.RandStrValue
+import org.xtext.mdsd.external.quickCheckApi.RandIntValue
+import org.xtext.mdsd.external.quickCheckApi.IgnoreValue
 
 class QCUtils {
+	static var jsonKeyForCompile = ""
 		
 	def static List<Request> filterbyMethod(EList<Request> requests, Class<? extends Method> method){
 		val filtered = new ArrayList
@@ -75,9 +79,10 @@ class QCUtils {
 		'''[«FOR value : json.jsonValues SEPARATOR ","»«value.compileJson»«ENDFOR»]'''
 	}
 	def static dispatch CharSequence compileJson(JsonPair json){
-		if(QCJsonUtils.isIdInJson(json)){
+		if(QCJsonUtils.isIdInJson(json) || QCJsonUtils.isIgnoreInJson(json)){
 			''''''
 		} else {
+			jsonKeyForCompile = json.key
 			'''\"«json.key»\":«json.value.compileJson»'''
 		}
 	}
@@ -86,6 +91,15 @@ class QCUtils {
 	}
 	def static dispatch CharSequence compileJson(StringValue json){
 		'''\"«json.value»\"'''
+	}
+	def static dispatch CharSequence compileJson(RandIntValue json){
+		'''" ^ «jsonKeyForCompile» ^ "'''
+	}
+	def static dispatch CharSequence compileJson(RandStrValue json){
+		'''" ^ «jsonKeyForCompile» ^ "'''
+	}
+	def static dispatch CharSequence compileJson(IgnoreValue json){
+		''''''
 	}
 	def static dispatch CharSequence compileJson(NestedJsonValue json){
 		'''«json.value.compileJson»'''
@@ -105,7 +119,111 @@ class QCUtils {
 		QCJsonUtils.trimJson(QCUtils.compileJson(json))
 	}	
 	
+	def static CharSequence compilePatternMatchingRequest(Request request){
+		if(request.body !== null){
+			'''«QCUtils.toUpperCaseFunction(request.name)»«IF request.body.value.countInputJsonUse > 1»(«ENDIF»«request.body.value.compilePatternMatchingJsonUse»«IF request.body.value.countInputJsonUse > 1»)«ENDIF» -> '''
+		} else if(request.requireIndex){
+			'''«QCUtils.toUpperCaseFunction(request.name)» ix -> '''
+		} else if(!request.requireIndex){
+			'''«QCUtils.toUpperCaseFunction(request.name)» -> '''
+		}
+	}
+	
+	def static dispatch CharSequence compilePatternMatchingJsonUse(Json json){
+		compilePatternMatching(json)
+	}
+	def static dispatch CharSequence compilePatternMatchingJsonUse(VariableUse json){
+		compilePatternMatching(json.variable.variableValue)
+	}
+	
+	def static dispatch CharSequence compilePatternMatching(JsonObject json){
+		var first = true
+		var result = ""
+		for(Json jsonPair : json.jsonPairs) {
+			if(first){
+				result += compilePatternMatching(jsonPair)
+				first = false;
+			} else {
+				result += "," + compilePatternMatching(jsonPair)
+			}
+		}
+		result
+	}
+	def static dispatch CharSequence compilePatternMatching(JsonList json){
+		''''''
+	}
+	def static dispatch CharSequence compilePatternMatching(JsonPair json){
+		'''«IF QCJsonUtils.isIdInJson(json.value)»ix«ELSEIF QCJsonUtils.containsRandomGenerationJson(json.value)»«json.key»«ENDIF»'''
+	}
+	def static dispatch CharSequence compilePatternMatching(IntValue json){
+		''''''
+	}
+	def static dispatch CharSequence compilePatternMatching(StringValue json){
+		''''''
+	}
+	def static dispatch CharSequence compilePatternMatching(IdValue json){
+		''''''
+	}
+	def static dispatch CharSequence compilePatternMatching(RandStrValue json){
+		''''''
+	}
+	def static dispatch CharSequence compilePatternMatching(RandIntValue json){
+		''''''
+	}
+	def static dispatch CharSequence compilePatternMatching(IgnoreValue json){
+		''''''
+	}
+	def static dispatch CharSequence compilePatternMatching(NestedJsonValue json){
+		''''''
+	}
+	def static dispatch CharSequence compilePatternMatching(ListJsonValue json){
+		''''''
+	}
 	
 	
+	
+	def static dispatch int countInputJsonUse(Json json){
+		countInputJson(json)
+	}
+	def static dispatch int countInputJsonUse(VariableUse json){
+		countInputJson(json.variable.variableValue)	
+	}
+	def static dispatch int countInputJson(JsonObject json){
+		var result = 0
+		for(Json jsonPair : json.jsonPairs) {
+			result += countInputJson(jsonPair)		
+		}
+		return result
+	}
+	def static dispatch int countInputJson(JsonList json){
+		0
+	}
+	def static dispatch int countInputJson(JsonPair json){
+		json.value.countInputJson
+	}
+	def static dispatch int countInputJson(IntValue json){
+		0
+	}
+	def static dispatch int countInputJson(StringValue json){
+		0
+	}
+	def static dispatch int countInputJson(IdValue json){
+		1
+	}
+	def static dispatch int countInputJson(RandStrValue json){
+		1
+	}
+	def static dispatch int countInputJson(RandIntValue json){
+		1
+	}
+	def static dispatch int countInputJson(IgnoreValue json){
+		0
+	}
+	def static dispatch int countInputJson(NestedJsonValue json){
+		0
+	}
+	def static dispatch int countInputJson(ListJsonValue json){
+		0
+	}
 	
 }

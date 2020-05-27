@@ -14,7 +14,7 @@ class QCNextState {
 		'''
 		let next_state cmd state = match cmd with
 			«FOR request : test.requests»
-			| «QCUtils.toUpperCaseFunction(request.name)» «request.compileNextState»
+			| «QCUtils.compilePatternMatchingRequest(request)» «request.compileNextState»
 			«ENDFOR»
 		'''
 	}
@@ -26,22 +26,22 @@ class QCNextState {
 	def CharSequence compile(Action action){
 		
 		if (action instanceof CreateAction) {
-			''' -> state@["«QCUtils.compileJsonUse(action.value)»"]'''	
+			'''state@["«QCUtils.compileJsonUse(action.value)»"]'''	
 		} else if (action instanceof DeleteAction){
 			'''
-			ix -> let pos = getPos ix state in
-			      (* Returns a list of all items except that which is 'item' found above *)
-			      let l = remove_item pos state in
-			      l
+			let pos = getPos ix state in
+			(* Returns a list of all items except that which is 'item' found above *)
+			let l = remove_item pos state in
+			l
 	        '''
 		} else if (action instanceof UpdateAction){
 			'''
-			ix -> let newelem = "«QCUtils.compileJsonUse(action.value)»" in
-			      let pos = getPos ix state in
-			      replaceElem pos state newelem
+			let newelem = "«QCUtils.compileJsonUse(action.value)»" in
+			let pos = getPos ix state in
+			replaceElem pos state newelem
 			'''	
 		} else if (action instanceof NoAction){
-			''' ix -> state'''
+			'''state'''
 		} else {
 			''''''
 		}

@@ -108,7 +108,17 @@ JsonPair returns Json:
 JsonValue returns Json:
 	{StringValue} value=STRING | {IntValue} value=INT |
 	{NestedJsonValue} value=JsonObject | {ListJsonValue} value=JsonList |
-	{IdValue} value=IdJson
+	{IdValue} value=IdJson | {RandStrValue} value=RandStrJson | {RandIntValue} value=RandIntJson | {IgnoreValue} value=IgnoreJson
+;
+
+RandStrJson:
+	"@String"
+;
+RandIntJson:
+	"@Int"
+;
+IgnoreJson:
+	"@Ignore"
 ;
 
 IdJson:

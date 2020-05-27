@@ -13,6 +13,9 @@ import org.xtext.mdsd.external.quickCheckApi.VariableUse
 import org.xtext.mdsd.external.quickCheckApi.IntType
 import org.xtext.mdsd.external.quickCheckApi.StrType
 import org.xtext.mdsd.external.quickCheckApi.IdType
+import org.xtext.mdsd.external.quickCheckApi.RandIntValue
+import org.xtext.mdsd.external.quickCheckApi.RandStrValue
+import org.xtext.mdsd.external.quickCheckApi.IgnoreValue
 
 class QCJsonUtils {
 	
@@ -50,6 +53,15 @@ class QCJsonUtils {
 	}
 	def static dispatch boolean isIdInJson(IdValue json){
 		true
+	}
+	def static dispatch boolean isIdInJson(RandStrValue json){
+		false
+	}
+	def static dispatch boolean isIdInJson(RandIntValue json){
+		false
+	}
+	def static dispatch boolean isIdInJson(IgnoreValue json){
+		false
 	}
 	def static dispatch boolean isIdInJson(NestedJsonValue json){
 		isIdInJson(json.value)
@@ -91,6 +103,15 @@ class QCJsonUtils {
 	}
 	def static dispatch CharSequence extractIdFunction(IdValue json){
 		'''«extractIdConversion(json.value.idType)»'''
+	}
+	def static dispatch CharSequence extractIdFunction(RandStrValue json){
+		''''''
+	}
+	def static dispatch CharSequence extractIdFunction(RandIntValue json){
+		''''''
+	}
+	def static dispatch CharSequence extractIdFunction(IgnoreValue json){
+		''''''
 	}
 	def static dispatch CharSequence extractIdFunction(NestedJsonValue json){
 		''''''
@@ -138,11 +159,126 @@ class QCJsonUtils {
 	def static dispatch CharSequence extractIdJsonFromJson(IdValue json){
 		'''" ^ id ^ "'''
 	}
+	def static dispatch CharSequence extractIdJsonFromJson(RandStrValue json){
+		''''''
+	}
+	def static dispatch CharSequence extractIdJsonFromJson(RandIntValue json){
+		''''''
+	}
+	def static dispatch CharSequence extractIdJsonFromJson(IgnoreValue json){
+		''''''
+	}
 	def static dispatch CharSequence extractIdJsonFromJson(NestedJsonValue json){
 		''''''
 	}
 	def static dispatch CharSequence extractIdJsonFromJson(ListJsonValue json){
 		''''''
 	}
+	
+	
+	def static dispatch boolean containsRandomGenerationJsonUse(Json json){
+		containsRandomGenerationJson(json)
+	}
+	def static dispatch boolean containsRandomGenerationJsonUse(VariableUse json){
+		containsRandomGenerationJson(json.variable.variableValue)	
+	}
+	
+	def static dispatch boolean containsRandomGenerationJson(JsonObject json){
+		for(Json jsonPair : json.jsonPairs) {
+			if(containsRandomGenerationJson(jsonPair)){
+				return true
+			}
+		}
+		false
+	}
+	def static dispatch boolean containsRandomGenerationJson(JsonList json){
+		for(Json jsonValue : json.jsonValues) {
+			if(containsRandomGenerationJson(jsonValue)){
+				return true
+			}
+		}
+		false
+	}
+	def static dispatch boolean containsRandomGenerationJson(JsonPair json){
+		containsRandomGenerationJson(json.value)
+	}
+	def static dispatch boolean containsRandomGenerationJson(IntValue json){
+		false
+	}
+	def static dispatch boolean containsRandomGenerationJson(StringValue json){
+		false
+	}
+	def static dispatch boolean containsRandomGenerationJson(IdValue json){
+		false
+	}
+	def static dispatch boolean containsRandomGenerationJson(RandIntValue json){
+		true
+	}
+	def static dispatch boolean containsRandomGenerationJson(RandStrValue json){
+		true
+	}
+	def static dispatch boolean containsRandomGenerationJson(IgnoreValue json){
+		false
+	}
+	def static dispatch boolean containsRandomGenerationJson(NestedJsonValue json){
+		containsRandomGenerationJson(json.value)
+	}
+	def static dispatch boolean containsRandomGenerationJson(ListJsonValue json){
+		containsRandomGenerationJson(json.value)
+	}
+	
+	def static dispatch boolean isIgnoreInJsonUse(Json json){
+		isIgnoreInJson(json)
+	}
+	def static dispatch boolean isIgnoreInJsonUse(VariableUse json){
+		isIgnoreInJson(json.variable.variableValue)
+	}
+	
+	def static dispatch boolean isIgnoreInJson(JsonObject json){
+		for(Json jsonPair : json.jsonPairs) {
+			if(isIgnoreInJson(jsonPair)){
+				return true
+			}
+		}
+		false
+	}
+	def static dispatch boolean isIgnoreInJson(JsonList json){
+		for(Json jsonValue : json.jsonValues) {
+			if(isIgnoreInJson(jsonValue)){
+				return true
+			}
+		}
+		false
+	}
+	def static dispatch boolean isIgnoreInJson(JsonPair json){
+		isIgnoreInJson(json.value)
+	}
+	def static dispatch boolean isIgnoreInJson(IntValue json){
+		false
+	}
+	def static dispatch boolean isIgnoreInJson(StringValue json){
+		false
+	}
+	def static dispatch boolean isIgnoreInJson(IdValue json){
+		false
+	}
+	def static dispatch boolean isIgnoreInJson(RandStrValue json){
+		false
+	}
+	def static dispatch boolean isIgnoreInJson(RandIntValue json){
+		false
+	}
+	def static dispatch boolean isIgnoreInJson(IgnoreValue json){
+		true
+	}
+	def static dispatch boolean isIgnoreInJson(NestedJsonValue json){
+		isIgnoreInJson(json.value)
+	}
+	def static dispatch boolean isIgnoreInJson(ListJsonValue json){
+		isIgnoreInJson(json.value)
+	}
+	
+	
+	
 	
 }
