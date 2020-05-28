@@ -20,6 +20,7 @@ import org.xtext.mdsd.external.quickCheckApi.IdValue
 import org.xtext.mdsd.external.quickCheckApi.RandStrValue
 import org.xtext.mdsd.external.quickCheckApi.RandIntValue
 import org.xtext.mdsd.external.quickCheckApi.IgnoreValue
+import org.xtext.mdsd.external.quickCheckApi.VariableDef
 
 class QCUtils {
 	static var jsonKeyForCompile = ""
@@ -121,7 +122,7 @@ class QCUtils {
 	
 	def static CharSequence compilePatternMatchingRequest(Request request){
 		if(request.body !== null){
-			'''«QCUtils.toUpperCaseFunction(request.name)»«IF request.body.value.countInputJsonUse > 1»(«ENDIF»«request.body.value.compilePatternMatchingJsonUse»«IF request.body.value.countInputJsonUse > 1»)«ENDIF» -> '''
+			'''«QCUtils.toUpperCaseFunction(request.name)»«IF request.body.value.countInputJsonUse > 1»(«ENDIF» «request.body.value.compilePatternMatchingJsonUse»«IF request.body.value.countInputJsonUse > 1»)«ENDIF» -> '''
 		} else if(request.requireIndex){
 			'''«QCUtils.toUpperCaseFunction(request.name)» ix -> '''
 		} else if(!request.requireIndex){
@@ -226,4 +227,11 @@ class QCUtils {
 		0
 	}
 	
+	
+	def static dispatch CharSequence getVariableDefName(VariableUse varUse){
+		varUse.variable.name
+	}
+	def static dispatch CharSequence getVariableDefName(Json json){
+		''''''
+	}
 }

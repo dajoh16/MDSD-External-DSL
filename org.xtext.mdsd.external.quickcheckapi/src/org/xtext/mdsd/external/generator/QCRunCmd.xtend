@@ -26,7 +26,7 @@ class QCRunCmd {
 		'''
 		let run_cmd cmd state sut = match cmd with
 			«FOR request : test.requests»
-			| «QCUtils.toUpperCaseFunction(request.name)» «request.action.determineIndex» «request.compileRunCmd»
+			| «QCUtils.compilePatternMatchingRequest(request)» «request.compileRunCmd»
 			«ENDFOR»
 		'''
 	}
@@ -106,7 +106,12 @@ class QCRunCmd {
 					let stateJson = Yojson.Basic.from_string extractedState in
 						let sutJson = Yojson.Basic.from_string («QCJsonUtils.extractIdJsonFromJsonUse(condition.requestValue.body)») in
 							let combined = Yojson.Basic.Util.combine stateJson sutJson
+							«IF QCJsonUtils.isIgnoreInJsonUse(condition.requestValue.body)»
+							let filteredContent = ignore«QCUtils.getVariableDefName(condition.requestValue.body)» content in
+							«condition.requestOp.compileRequestOp» (String.compare (Yojson.Basic.to_string combined) (Yojson.Basic.to_string filteredContent) == 0)
+							«ELSE»
 							«condition.requestOp.compileRequestOp» (String.compare (Yojson.Basic.to_string combined) (Yojson.Basic.to_string content) == 0)
+							«ENDIF»
 			'''
 			
 		} else {

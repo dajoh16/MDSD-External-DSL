@@ -173,28 +173,11 @@ class QCBoilerplate {
 	private def CharSequence initExternalsInterface() {
 		'''
 		open Yojson
-		«combineInterface()»
-		
-		«extractIdinterface()»
 		
 		«cleanupInterface()»
 		'''
 	}
 	
-	private def CharSequence combineInterface() {
-		'''
-		(* Implement this method to combine your state and id *)
-		val combine_state_id : Yojson.Basic.t -> string -> Yojson.Basic.t
-			
-		'''
-	}
-	
-	private def CharSequence extractIdinterface() {
-		'''
-		(* Implement this method to extract your id from a json body *)
-		val extractIdFromContent : Yojson.Basic.t -> string
-		'''
-	}
 	
 	private def CharSequence cleanupInterface() {
 		'''
