@@ -14,7 +14,7 @@ VariableDef:
 
 Request:
     "request" name=ID method=Method url=URL ("Precond:" preconditions=PreLogicExp)? 
-    (params=Param)? body=Body? ("STATE:" action=Action) ("Postcond:"postconditions=PostLogicExp)?
+     body=Body? ("STATE:" action=Action) ("Postcond:"postconditions=PostLogicExp)?
 ;
 
 
@@ -57,23 +57,6 @@ Port:
 
 Protocol:
 	"http" | "https"	
-;
-
-
-Param:
-	"parameters" pairs+=KVPair (";" pairs+=KVPair)*	
-;
-
-KVPair:
-	key=Key "=" value=Value 
-;
-
-Value:
-	ID | INT
-;
-
-Key:
-	name=ID	
 ;
 
 Body:
